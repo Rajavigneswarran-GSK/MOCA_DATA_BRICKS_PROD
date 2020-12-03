@@ -280,7 +280,16 @@ select * from F_CER_PORTAL_BRAND_MONTHLY_NEW_HCP
 union
 select * from F_CER_EDETAIL_BRAND_MONTHLY_NEW_HCP
 """)
-
+df.createOrReplaceTempView("F_CER_BRAND_INCREMENTAL_HCP")
+df=spark.sql("""
+select COUNTRY_ID
+,MonthYear as CALEN_MO_YEAR
+,GLOBAL_PRODUCT_ID
+,customer_count as MONTHLY_NEW_CUSTOMER_COUNT
+,CUMSUM as MONTHLY_NEW_CUSTOMER_CUMULATIVE_COUNT
+,channel as MARKETING_CHANNEL_NAME
+from F_CER_BRAND_INCREMENTAL_HCP
+""")
 df.write.format("delta").mode("overwrite").option("overwriteSchema","true").saveAsTable("MOCA.F_CER_BRAND_INCREMENTAL_HCP")
 
 # COMMAND ----------
@@ -441,7 +450,15 @@ select * from F_CER_PORTAL_MONTHLY_NEW_HCP
 union
 select * from F_CER_EDETAIL_MONTHLY_NEW_HCP
 """)
-#df.createOrReplaceTempView("F_CER_INCREMENTAL_HCP")
+df.createOrReplaceTempView("F_CER_INCREMENTAL_HCP")
+df=spark.sql("""
+select COUNTRY_ID
+,MonthYear as CALEN_MO_YEAR
+,customer_count as MONTHLY_NEW_CUSTOMER_COUNT
+,CUMSUM as MONTHLY_NEW_CUSTOMER_CUMULATIVE_COUNT
+,channel as MARKETING_CHANNEL_NAME
+from F_CER_INCREMENTAL_HCP
+""")
 df.write.format("delta").mode("overwrite").option("overwriteSchema","true").saveAsTable("MOCA.F_CER_INCREMENTAL_HCP")
 
 
